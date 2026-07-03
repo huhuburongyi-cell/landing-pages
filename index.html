@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>景秀游戏｜买量落地页汇总</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0f;--card:#14141f;--card-hover:#1a1a2e;
+  --text:#e8e8f0;--text-dim:#8888a0;--accent:#6c5ce7;
+  --accent-light:#a29bfe;--border:#2a2a3e;--tag-bg:#1e1e30;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;line-height:1.6;min-height:100vh}
+
+/* Header */
+.header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:16px 24px}
+.header-inner{max-width:1600px;margin:0 auto;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.logo{font-size:20px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.search-box{flex:1;min-width:200px;max-width:400px;position:relative}
+.search-box input{width:100%;padding:10px 16px 10px 40px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:14px;outline:none;transition:border .2s}
+.search-box input:focus{border-color:var(--accent)}
+.search-box svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-dim)}
+.stats{font-size:13px;color:var(--text-dim);white-space:nowrap}
+
+/* Filters */
+.filters{max-width:1600px;margin:0 auto;padding:16px 24px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.filter-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.filter-label{font-size:12px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.filter-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:13px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.filter-btn:hover{border-color:var(--accent);color:var(--text)}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.divider{width:1px;height:24px;background:var(--border);margin:0 8px}
+
+/* Grid */
+.grid-container{max-width:1600px;margin:0 auto;padding:16px 24px 60px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+
+/* Card */
+.card{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--border);transition:all .3s;cursor:pointer}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--accent)}
+.card-images{position:relative;overflow:hidden;background:#0d0d15}
+.card-images .img-scroll{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none}
+.card-images .img-scroll::-webkit-scrollbar{display:none}
+.card-images .img-item{flex:0 0 100%;scroll-snap-align:start;position:relative}
+.card-images .img-item img{width:100%;height:auto;min-height:200px;max-height:420px;object-fit:cover;object-position:top;display:block;transition:transform .3s}
+.card:hover .img-item img{transform:scale(1.02)}
+.img-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2}
+.img-dots .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4);transition:all .2s}
+.img-dots .dot.active{background:#fff;transform:scale(1.3)}
+.img-count{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.65);padding:2px 8px;border-radius:10px;font-size:11px;color:#fff;z-index:2}
+
+.card-body{padding:14px 16px}
+.card-title{font-size:14px;font-weight:600;line-height:1.5;margin-bottom:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{padding:2px 10px;border-radius:12px;font-size:11px;background:var(--tag-bg);color:var(--accent-light);border:1px solid rgba(108,92,231,.2)}
+.tag.game{background:rgba(108,92,231,.15);border-color:rgba(108,92,231,.3);color:var(--accent-light);font-weight:600}
+.tag.stage{background:rgba(0,206,209,.1);border-color:rgba(0,206,209,.2);color:#00ced1}
+.tag.cat{background:rgba(255,165,0,.08);border-color:rgba(255,165,0,.15);color:#ffa500}
+
+/* Lightbox */
+.lightbox{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1000;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.lightbox.show{display:flex}
+.lightbox-close{position:absolute;top:20px;right:24px;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10}
+.lightbox-close:hover{background:rgba(255,255,255,.2)}
+.lightbox-content{display:flex;align-items:center;justify-content:center;max-height:90vh;max-width:90vw;overflow:auto}
+.lightbox-content img{max-height:88vh;max-width:88vw;object-fit:contain;border-radius:8px}
+.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:background .2s}
+.lightbox-nav:hover{background:rgba(255,255,255,.25)}
+.lightbox-nav.prev{left:20px}
+.lightbox-nav.next{right:20px}
+.lightbox-info{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);text-align:center;max-width:80vw}
+.lightbox-info .lb-title{font-size:15px;color:#fff;margin-bottom:4px}
+.lightbox-info .lb-meta{font-size:12px;color:rgba(255,255,255,.5)}
+
+/* Empty state */
+.empty{text-align:center;padding:80px 20px;color:var(--text-dim)}
+.empty svg{width:64px;height:64px;margin-bottom:16px;opacity:.4}
+.empty p{font-size:15px}
+
+/* Responsive */
+@media(max-width:768px){
+  .header-inner{gap:12px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+  .filters{padding:12px 16px}
+  .grid-container{padding:12px 16px 40px}
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-dim)}
+
+/* Back to top */
+.back-to-top{position:fixed;bottom:32px;right:32px;width:44px;height:44px;border-radius:50%;border:1px solid var(--border);background:rgba(20,20,31,.9);backdrop-filter:blur(10px);color:var(--text);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:99;opacity:0;transform:translateY(12px);pointer-events:none;transition:all .3s}
+.back-to-top.show{opacity:1;transform:translateY(0);pointer-events:auto}
+.back-to-top:hover{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 4px 16px rgba(108,92,231,.4)}
+
+/* Animation */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.card{animation:fadeUp .4s ease both}
+.card:nth-child(2){animation-delay:.03s}
+.card:nth-child(3){animation-delay:.06s}
+.card:nth-child(4){animation-delay:.09s}
+.card:nth-child(5){animation-delay:.12s}
+.card:nth-child(6){animation-delay:.15s}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">景秀游戏｜买量落地页汇总</div>
+    <div class="search-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="搜索标题关键词...">
+    </div>
+    <div class="stats" id="stats">共 77 条记录</div>
+  </div>
+</div>
+
+<div class="filters">
+  <div class="filter-group">
+    <span class="filter-label">游戏</span>
+    <div id="gameFilters"></div>
+  </div>
+  <div class="divider"></div>
+  <div class="filter-group">
+    <span class="filter-label">阶段</span>
+    <div id="stageFilters"></div>
+  </div>
+  <div class="divider"></div>
+  <div class="filter-group">
+    <span class="filter-label">品类</span>
+    <div id="catFilters"></div>
+  </div>
+</div>
+
+<div class="grid-container">
+  <div class="grid" id="cardGrid"></div>
+  <div class="empty" id="emptyState" style="display:none">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    <p>没有找到匹配的记录，试试调整筛选条件</p>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <button class="lightbox-nav prev" onclick="navLightbox(-1)">‹</button>
+  <div class="lightbox-content"><img id="lbImg" src="" alt=""></div>
+  <button class="lightbox-nav next" onclick="navLightbox(1)">›</button>
+  <div class="lightbox-info">
+    <div class="lb-title" id="lbTitle"></div>
+    <div class="lb-meta" id="lbMeta"></div>
+  </div>
+</div>
+
+<script>
+const DATA = [{"game": "世界启元", "title": "全橙畅玩 即刻开战", "images": ["./images/BW4hbjwWSoMtgBxfKRucoL9zn4g.jpg"], "stage": "上线后", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "预警生存挑战开启 全新S1赛季", "images": ["./images/MCGXbnTBko0wagxUbkwcBlXNnwf.jpg", "./images/YSFGbPOA2ouWeFxjnU6c5PUqne6.jpg", "./images/IXavbtj6Zo6Y72xwNSUcE7uHnIf.jpg"], "stage": "上线后", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "铁流澎湃 向海图强 第四纪元怒海狂涛", "images": ["./images/Nn7bbyc1eor9zaxmMDSclMqsnYe.jpg"], "stage": "上线后", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "上线130抽 开局爽爆", "images": ["./images/KmKIbeIeQo5bouxnicPc5Dqrnhf.jpg"], "stage": "公测期", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "老秦开飞机！跨时代战争策略新游来了", "images": ["./images/TNPNbYtNto9nHPxhJZpcr1c5nse.jpg"], "stage": "预约期", "category": ["SLG/策略", "战争"]}, {"game": "排球少年", "title": "乌鸦VS猫宿命之战 一场不能输的对决", "images": ["./images/FO1qbHgsuo3KGEx1Jdhc9yE7noc.jpg"], "stage": "预约期", "category": ["体育", "二次元"]}, {"game": "排球少年", "title": "我们的目标是问鼎全国冠军！", "images": ["./images/MhYEbFZ8UoneBxx9xHXcn3T7nMb.jpg"], "stage": "公测期", "category": ["体育", "二次元"]}, {"game": "大奉打更人", "title": "大奉搜打撤 MMO手游", "images": ["./images/GzPCb8JD6o09rGxl0zGcGrEhndd.jpg"], "stage": "预约期", "category": ["二次元", "国风", "仙侠"]}, {"game": "荒野国度", "title": "扬帆测试 限时返利 至高可享450%", "images": ["./images/MDykbsFCEoB1OexBBWGcUkPHnQc.jpg", "./images/TeKcb7lnDoht68xbYmNcUv6enOb.jpg", "./images/LaqVbwmFPoP7nDxXbeicDsVUnBf.jpg"], "stage": "", "category": ["SLG/策略", "卡通", "魔幻"]}, {"game": "荒野国度", "title": "2025全新兽娘SLG来袭", "images": ["./images/GtFBbyPV6oBv3Txgg0IcZVWQnRg.jpg"], "stage": "预约期/公测期", "category": ["SLG/策略", "卡通", "魔幻"]}, {"game": "群星纪元", "title": "奇点测试 招募开启 异形降临决战虫潮", "images": ["./images/DIBpbUIamosfVOxwOKIc7ybKnAh.jpg"], "stage": "测试期", "category": ["SLG/策略", "科幻", "MMORPG"]}, {"game": "群星纪元", "title": "异星战场 决战虫潮", "images": ["./images/H1SBb6aM2ojPD5xyTrwcedZvnxg.jpg"], "stage": "测试期/预约期", "category": ["SLG/策略", "科幻", "MMORPG"]}, {"game": "群星纪元", "title": "代言人", "images": ["./images/OLlXbWQ4Bow6Atx7XbJcJ4NwnvZ.jpg"], "stage": "预约期/公测期", "category": ["SLG/策略", "科幻", "MMORPG"]}, {"game": "龙石战争", "title": "主城即战场 龙城测试至高返利300%", "images": ["./images/Ruuhbv1TvowPbrxrfY0chBg4n2e.jpg"], "stage": "测试期", "category": ["SLG/策略", "魔幻", "卡通"]}, {"game": "龙石战争", "title": "", "images": ["./images/EjkIbb9eboXMJWxjolHcoIx6nrg.jpg"], "stage": "测试期", "category": ["SLG/策略", "魔幻", "卡通"]}, {"game": "偃武", "title": "烽火测试 限时开启", "images": ["./images/GebVbqLkoodW5ixmXlCcgeRMnuc.jpg"], "stage": "测试期", "category": ["SLG/策略", "国风", "三国"]}, {"game": "龙石战争", "title": "龙腾终测 限定开启 最高返利300%", "images": ["./images/ZJQQbCJLJo1zDrxUY34cGepGnwd.jpg"], "stage": "预约期", "category": ["SLG/策略", "魔幻", "卡通"]}, {"game": "龙石战争", "title": "驯龙高手 我当定了 正版驯龙塔防SLG", "images": ["./images/IpHDb5GmooEYwVxM9WWcnI92nKf.jpg"], "stage": "公测期", "category": ["SLG/策略", "魔幻", "卡通"]}, {"game": "龙石战争", "title": "塔防攻城 驯龙出征", "images": ["./images/ROWubylvhojv2jxm5HzcM5J6nBg.jpg"], "stage": "公测期", "category": ["SLG/策略", "魔幻", "卡通"]}, {"game": "偃武", "title": "即时三国 全面开战", "images": ["./images/Mv7Bb2Y9ao2CTJxpbmdc6Yj2n4e.jpg"], "stage": "预约期", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "即时三国 全面开战", "images": ["./images/JZJEbzNOgoveLqxFh1zcBQ8Qnjc.jpg"], "stage": "预约期", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "即时三国 全面开战", "images": ["./images/II5fbKthtowUg8xHOOhcruPEnec.jpg"], "stage": "公测期", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "即时三国 全面开战 七日拿神将许褚", "images": ["./images/Ud2ebmZsboChsrxiZvAcWJwQn5c.jpg"], "stage": "公测期", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "即时三国 全面开战", "images": ["./images/F2hwbTz1Jo9uecxabQycBzuenGc.jpg"], "stage": "上线后", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "偃武×昆明市博物馆 联动上线", "images": ["./images/CZFgbAl9lo0F6GxGxp9cxgubnyg.jpg"], "stage": "上线后", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "首赛季免费 1584抽", "images": ["./images/MJ5Fby9Ito8iPjxmHxkcwJhjnvh.jpg"], "stage": "上线后", "category": ["SLG/策略", "国风", "三国"]}, {"game": "足球", "title": "48倍速足球模拟器 点亮冠军梦想", "images": ["./images/BeMnbebigoYA1yxyosIcwJmVnCg.jpg"], "stage": "测试期", "category": ["体育", "写实"]}, {"game": "仙界大掌门", "title": "御剑除邪 守卫宗门", "images": ["./images/X8cubTZLoo7ZonxDq57c7LLtnOg.jpg"], "stage": "测试期", "category": ["二次元", "仙侠", "国风"]}, {"game": "仙界大掌门", "title": "修建万古仙宗 修真仙大道", "images": ["./images/Z9AhbRD3eoEjvpxr2EvcnF9SnOf.jpg", "./images/SIndbvwnkonV4Ox1dS4cotHUnVd.jpg"], "stage": "测试期", "category": ["二次元", "仙侠", "国风"]}, {"game": "权游", "title": "传送带塔防守卫北境", "images": ["./images/IVGBbYbY6othfFxkvqVcutU9nQg.jpg"], "stage": "测试期", "category": ["IP改编", "卡通"]}, {"game": "红警OL", "title": "无尽闯关 收集发育 解压割草 放置塔防", "images": ["./images/CiOKbMnlrowh88xLUYGc754QnXe.jpg", "./images/WUr9bIPbWorg22x1lqHc509DnYd.jpg", "./images/Zdb5bzqQ3oXPdEx2HVlcHeSGnwb.jpg", "./images/CJfgbigGDoQvyWxOOgdcT8HJnic.jpg"], "stage": "测试期", "category": ["SLG/策略", "战争"]}, {"game": "其他测试", "title": "维和步兵营 休闲策略 合成塔防", "images": ["./images/ClFSb3afMoMhajxRI4Ic6nkHnEd.jpg", "./images/OJV2by8yOoBMxCx28m4cs4S2nDf.jpg", "./images/BVu6b5h6so5GMMx6lFkcrYf6nic.jpg", "./images/VUokbsynVoOARmxPUs9cRM77nPc.jpg"], "stage": "测试期", "category": ["其他", "战争"]}, {"game": "其他测试", "title": "维和步兵营 休闲策略 合成塔防", "images": ["./images/DGP4b5OB6oxF7wxMhnMceSYjnQd.jpg", "./images/InzmbX0v3o7ye8x9klYc43E2nqe.jpg", "./images/ZviZbOg1DoumHFxLdzncmIodnNf.jpg"], "stage": "测试期", "category": ["其他", "战争"]}, {"game": "其他测试", "title": "数字门", "images": ["./images/UylRbgtTNoxonaxq6aicNbbenTb.jpg"], "stage": "测试期", "category": ["其他", "战争"]}, {"game": "大奉打更人", "title": "自由武侠 MMO手游", "images": ["./images/Ing8bsWD9o1ZhGxrgDdc5BTGnnc.jpg"], "stage": "预约期", "category": ["二次元", "国风", "仙侠"]}, {"game": "荒野国度", "title": "阵营纷起 万人争霸", "images": ["./images/TZDObTBsioefusxnYYLcToT1nAf.jpg"], "stage": "预约期/公测期", "category": ["SLG/策略", "卡通", "魔幻"]}, {"game": "荒野国度", "title": "不玩三国 就玩荒野国度", "images": ["./images/YPIQbDwMGoCBrwxEUpMcTqlynkc.jpg"], "stage": "预约期/公测期", "category": ["SLG/策略", "卡通", "魔幻"]}, {"game": "龙石战争", "title": "塔防攻城 驯龙出征", "images": ["./images/YM8sboRfOoM5OCxmwrIcdoBlnLd.jpg"], "stage": "测试期", "category": ["SLG/策略", "魔幻", "卡通"]}, {"game": "龙石战争", "title": "驭龙火拼 策略为王 龙城测试至高返利300%", "images": ["./images/ZOWabEh7uoBRzbxSA8pcC2hBndd.jpg"], "stage": "测试期", "category": ["SLG/策略", "魔幻", "卡通"]}, {"game": "龙石战争", "title": "龙城测试 至高返利300%", "images": ["./images/GIQKb4OdDo2k0txU1WacneCxnjc.jpg"], "stage": "测试期", "category": ["SLG/策略", "魔幻", "卡通"]}, {"game": "群星纪元", "title": "异星战场 机甲对决 终测限时福利", "images": ["./images/LS43bztOxoxmTxxeCfUcQT8rnad.jpg"], "stage": "预约期/公测期", "category": ["SLG/策略", "科幻", "MMORPG"]}, {"game": "群星纪元", "title": "异星战场 决战虫潮 终测限时福利", "images": ["./images/XLvXbFmVwo8beTx3PHicVGOmnwj.jpg"], "stage": "预约期/公测期", "category": ["SLG/策略", "科幻", "MMORPG"]}, {"game": "群星纪元", "title": "异星战场 机甲对决 终测限时福利", "images": ["./images/OsSJbi24Oo8BRCxVOGUcpJt9nMf.jpg"], "stage": "预约期/公测期", "category": ["SLG/策略", "科幻", "MMORPG"]}, {"game": "群星纪元", "title": "异星战场 决战虫潮 终测限时福利", "images": ["./images/VorObiUVioqg9tx29SkcwWl9nf1.jpg"], "stage": "预约期/公测期", "category": ["SLG/策略", "科幻", "MMORPG"]}, {"game": "群星纪元", "title": "执掌星河 一击破界 吞噬星空联动", "images": ["./images/TkLVbLNoooa0Ksx2MEicFURSnVf.jpg"], "stage": "预约期/公测期", "category": ["SLG/策略", "科幻", "MMORPG"]}, {"game": "群星纪元", "title": "异星战场 机甲对决", "images": ["./images/A1W8buaDUodxokxLgdEcu39wnlU.jpg"], "stage": "测试期/预约期", "category": ["SLG/策略", "科幻", "MMORPG"]}, {"game": "群星纪元", "title": "异星战场 决战虫潮", "images": ["./images/YRTObxssho2HgjxhHlucMe2FnIb.jpg"], "stage": "测试期/预约期", "category": ["SLG/策略", "科幻", "MMORPG"]}, {"game": "群星纪元", "title": "人皇带队 决战虫潮", "images": ["./images/G44pb8vYnolwwExdJ4Hcq7PLnXf.jpg"], "stage": "测试期/预约期", "category": ["SLG/策略", "科幻", "MMORPG"]}, {"game": "群星纪元", "title": "异星战场 机甲对决", "images": ["./images/ZLJ1bNS2noU0MuxaZwhcYdzRncf.jpg"], "stage": "测试期/预约期", "category": ["SLG/策略", "科幻", "MMORPG"]}, {"game": "排球少年", "title": "飞吧！冲向新的顶端", "images": ["./images/CTfTbqFAwo3uaExxKMKcqPcAn3d.jpg"], "stage": "预约期", "category": ["体育", "二次元"]}, {"game": "排球少年", "title": "开服庆典 200抽", "images": ["./images/PwpSb0Y2eoT8HGxinbXcln0pned.jpg"], "stage": "公测期", "category": ["体育", "二次元"]}, {"game": "排球少年", "title": "乌鸦VS猫宿命之战 一场不能输的对决", "images": ["./images/NExtbSefwosnCUxOJfMcY9WPnif.jpg"], "stage": "公测期", "category": ["体育", "二次元"]}, {"game": "龙石战争", "title": "塔防攻城 驯龙出征", "images": ["./images/QiP6b5tTtoj7WexlekqcITekned.jpg"], "stage": "预约期", "category": ["SLG/策略", "魔幻", "卡通"]}, {"game": "龙石战争", "title": "塔防攻城 驯龙出征", "images": ["./images/EcpCbwtNGoSnFbxwWI6cZeWnnRb.jpg"], "stage": "公测期", "category": ["SLG/策略", "魔幻", "卡通"]}, {"game": "龙石战争", "title": "塔防攻城 驯龙出征", "images": ["./images/GfEybF1QmoHjiJxDfjVcUApbnzd.jpg"], "stage": "公测期", "category": ["SLG/策略", "魔幻", "卡通"]}, {"game": "仙界大掌门", "title": "国风穿越 修仙游戏", "images": ["./images/FY8gbgMK3oitXcxbq4WcP4GcnAd.jpg"], "stage": "测试期", "category": ["二次元", "仙侠", "国风"]}, {"game": "仙界大掌门", "title": "万神收录 穿越修仙", "images": ["./images/ASu0b2gf9oPe6Bx1d3UcJPwHneb.jpg"], "stage": "测试期", "category": ["二次元", "仙侠", "国风"]}, {"game": "偃武", "title": "烽火测试 限时招募", "images": ["./images/YfznbVfhSool9Fx6jVic63wpn6f.jpg"], "stage": "测试期", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "即时三国 全面开战", "images": ["./images/LwfzbkYJBobgEAx6LrDcb5Yznyb.jpg"], "stage": "测试期", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "即时三国 全面开战", "images": ["./images/OoeIbQHEVo3f24xIefScueRgnge.jpg"], "stage": "测试期", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "即时三国 全面开战", "images": ["./images/HXFObwLL5oeWKnxQBhfcELEInhc.jpg"], "stage": "预约期", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "即时三国 全面开战", "images": ["./images/CaNZbdpzio5J8hxtFVTcm6Mbnne.jpg"], "stage": "公测期", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "即时三国 全面开战", "images": ["./images/DCFdbmca6oTTpzxlMfVcVPuxnYb.jpg"], "stage": "公测期", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "即时三国 全面开战 1584连抽暴击", "images": ["./images/MdaZbqgkVoJyKXxC6dPckf0snLc.jpg"], "stage": "公测期", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "即时三国 全面开战 T0武将推荐", "images": ["./images/JJnebwwTIoF7c1xGXtrcOrjenFc.jpg"], "stage": "上线后", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "偃武×昆明市博物馆 联动上线", "images": ["./images/QHzLbL1pZo7aFZxy7STcOAXBn2d.jpg"], "stage": "上线后", "category": ["SLG/策略", "国风", "三国"]}, {"game": "偃武", "title": "首赛季免费 1584抽", "images": ["./images/F7dQb4h8moWl7HxnjfGcoZAJnVe.jpg"], "stage": "上线后", "category": ["SLG/策略", "国风", "三国"]}, {"game": "世界启元", "title": "铁流澎湃 向海图强 第四纪元怒海狂涛", "images": ["./images/C9P0bTUWZoH1XixCY3Rc6JEhnAd.jpg"], "stage": "上线后", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "饮马瀚海 封狼居胥 第三纪元封狼居胥", "images": ["./images/OnD6bhLa1o33QTxrl44ce2fJnn6.jpg"], "stage": "上线后", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "新时代新玩法新联动 S2赛季歼20东风登场", "images": ["./images/SinLbCUVIod4Btx0DMjcAHxmngf.jpg"], "stage": "上线后", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "布局海陆空三维战场", "images": ["./images/Aqz4b9B7Zo0ZwcxwFaictaHWnag.jpg"], "stage": "上线后", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "上线百连抽 开局爽爆 歼20联动", "images": ["./images/FrJmbtz2Foqv4HxF6F8ci8Tpn6d.jpg"], "stage": "预约期", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "多文明战场 就等你登场", "images": ["./images/Ba7Ibbq4rodNTAxWBaLcP7zKnbh.jpg"], "stage": "预约期", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "上线百连抽 开局爽爆", "images": ["./images/DKIBbmGFfo6Sbix5l6VccQVTnbf.jpg"], "stage": "预约期", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "征服海陆空战场", "images": ["./images/EFfcbMBztoZRqGxYpA9cAT8PnnX.jpg"], "stage": "公测期", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "上线130抽 开局爽爆", "images": ["./images/ZjCQbgYhoo9bAOxkb9YctBb7nLg.jpg"], "stage": "公测期", "category": ["SLG/策略", "战争"]}, {"game": "世界启元", "title": "开局爽爆 上线即送130抽", "images": ["./images/R7HxbFx5TozxS8xlccHcu27wnVc.jpg"], "stage": "公测期", "category": ["SLG/策略", "战争"]}, {"game": "红警荣耀", "title": "", "images": ["./images/UDaRb1CxYoCt1AxiMRVcZ4fsnkc.jpg"], "stage": "测试期", "category": ["IP改编", "战争", "写实", "SLG/策略"]}]
+let currentLbIndex = 0;
+let currentLbRecord = null;
+let currentLbImages = [];
+let activeFilters = { game: null, stage: null, category: null };
+let searchTerm = '';
+
+// Init
+function init() {
+  buildFilters();
+  renderCards();
+  document.getElementById('searchInput').addEventListener('input', e => {
+    searchTerm = e.target.value.trim().toLowerCase();
+    renderCards();
+  });
+}
+
+function buildFilters() {
+  const games = [...new Set(DATA.map(d => d.game))].sort();
+  const stages = [...new Set(DATA.map(d => d.stage).filter(Boolean))].sort();
+  const cats = [...new Set(DATA.flatMap(d => d.category))].sort();
+
+  const gameEl = document.getElementById('gameFilters');
+  gameEl.innerHTML = `<button class="filter-btn active" data-type="game" data-val="">全部</button>` +
+    games.map(g => `<button class="filter-btn" data-type="game" data-val="${g}">${g}</button>`).join('');
+
+  const stageEl = document.getElementById('stageFilters');
+  stageEl.innerHTML = `<button class="filter-btn active" data-type="stage" data-val="">全部</button>` +
+    stages.map(s => `<button class="filter-btn" data-type="stage" data-val="${s}">${s}</button>`).join('');
+
+  const catEl = document.getElementById('catFilters');
+  catEl.innerHTML = `<button class="filter-btn active" data-type="category" data-val="">全部</button>` +
+    cats.map(c => `<button class="filter-btn" data-type="category" data-val="${c}">${c}</button>`).join('');
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.dataset.type;
+      const val = btn.dataset.val || null;
+      activeFilters[type] = val;
+      // Update active state
+      btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderCards();
+    });
+  });
+}
+
+function getFiltered() {
+  return DATA.filter(d => {
+    if (activeFilters.game && d.game !== activeFilters.game) return false;
+    if (activeFilters.stage && d.stage !== activeFilters.stage) return false;
+    if (activeFilters.category && !d.category.includes(activeFilters.category)) return false;
+    if (searchTerm && !d.title.toLowerCase().includes(searchTerm)) return false;
+    return true;
+  });
+}
+
+function renderCards() {
+  const filtered = getFiltered();
+  const grid = document.getElementById('cardGrid');
+  const empty = document.getElementById('emptyState');
+  const stats = document.getElementById('stats');
+
+  stats.textContent = `显示 ${filtered.length} / ${DATA.length} 条`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = filtered.map((d, i) => {
+    const dots = d.images.length > 1
+      ? `<div class="img-dots">${d.images.map((_, j) => `<span class="dot${j===0?' active':''}"></span>`).join('')}</div>`
+      : '';
+    const count = d.images.length > 1
+      ? `<span class="img-count">${d.images.length} 张</span>`
+      : '';
+
+    return `<div class="card" data-idx="${i}" onclick="openLightbox(${i})">
+      <div class="card-images">
+        <div class="img-scroll" onscroll="updateDots(this)">
+          ${d.images.map(url => `<div class="img-item"><img src="${url}" alt="${d.title}" loading="lazy" onclick="event.stopPropagation();openLightbox(${i},0)"></div>`).join('')}
+        </div>
+        ${count}${dots}
+      </div>
+      <div class="card-body">
+        <div class="card-title">${d.title}</div>
+        <div class="card-tags">
+          <span class="tag game">${d.game}</span>
+          ${d.stage ? `<span class="tag stage">${d.stage}</span>` : ''}
+          ${d.category.map(c => `<span class="tag cat">${c}</span>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateDots(scrollEl) {
+  const dots = scrollEl.parentElement.querySelectorAll('.dot');
+  if (!dots.length) return;
+  const scrollLeft = scrollEl.scrollLeft;
+  const width = scrollEl.offsetWidth;
+  const idx = Math.round(scrollLeft / width);
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+
+// Lightbox
+function openLightbox(cardIdx, imgIdx = 0) {
+  const filtered = getFiltered();
+  const record = filtered[cardIdx];
+  if (!record) return;
+  currentLbImages = record.images;
+  currentLbIndex = imgIdx;
+  currentLbRecord = record;
+  updateLightbox();
+  document.getElementById('lightbox').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function navLightbox(dir) {
+  currentLbIndex = (currentLbIndex + dir + currentLbImages.length) % currentLbImages.length;
+  updateLightbox();
+}
+
+function updateLightbox() {
+  document.getElementById('lbImg').src = currentLbImages[currentLbIndex];
+  document.getElementById('lbTitle').textContent = currentLbRecord.title;
+  document.getElementById('lbMeta').textContent = `${currentLbRecord.game} · ${currentLbRecord.stage || ''} · ${currentLbIndex + 1}/${currentLbImages.length}`;
+  // Show/hide nav buttons
+  document.querySelector('.lightbox-nav.prev').style.display = currentLbImages.length > 1 ? '' : 'none';
+  document.querySelector('.lightbox-nav.next').style.display = currentLbImages.length > 1 ? '' : 'none';
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  const lb = document.getElementById('lightbox');
+  if (!lb.classList.contains('show')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') navLightbox(-1);
+  if (e.key === 'ArrowRight') navLightbox(1);
+});
+
+// Click outside to close lightbox
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === document.getElementById('lightbox') || e.target.classList.contains('lightbox-content')) {
+    closeLightbox();
+  }
+});
+
+// Back to top
+const backBtn = document.createElement('button');
+backBtn.className = 'back-to-top';
+backBtn.innerHTML = '↑';
+backBtn.title = '回到顶部';
+backBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+document.body.appendChild(backBtn);
+
+window.addEventListener('scroll', () => {
+  backBtn.classList.toggle('show', window.scrollY > 400);
+});
+
+init();
+</script>
+</body>
+</html>
